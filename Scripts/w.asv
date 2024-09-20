@@ -1,0 +1,13 @@
+function z = w(z)
+Zmin = 0;
+Zmax = 255;
+medelvardet = 0.5*(Zmin + Zmax);
+
+    if z <= medelvardet
+        z = 
+    else
+
+    end
+
+end
+
