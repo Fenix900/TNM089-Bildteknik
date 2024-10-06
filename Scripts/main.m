@@ -149,14 +149,14 @@ showRadianceMap(imRed, imGreen, imBlue);
 %Skapa HDR bilden genom att lägga ihop kanalerna
 HDR = cat(3, imRed, imGreen, imBlue);
 %% Global tone mapping
-saturationBoost = 2;
-onRGB = false;
+saturationBoost = 4;
+onRGB = true;
 
 g_result = globalToneMapping(HDR, onRGB, 'log', saturationBoost);
 
 figure;
 imshow(g_result);
-title('Global');
+title('Global (log)');
 %% Local tone mapping
 l_result = localToneMapping(HDR, 'bilatiral', 0.4);
 

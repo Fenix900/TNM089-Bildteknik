@@ -18,7 +18,7 @@ if onRGB
     end
 else %On luminance channel
     %Log2 for scale
-    RGB_hdr = log2(HDR + epsilon);
+    RGB_hdr = HDR;%log2(HDR + epsilon);
     RGB_hdr = (RGB_hdr - min(RGB_hdr(:)))/ (max(RGB_hdr(:)) - min(RGB_hdr(:)));%mat2gray(RGB_log2);
 
     %Convert to CIELAB
