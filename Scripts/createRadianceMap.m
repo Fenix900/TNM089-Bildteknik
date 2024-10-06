@@ -11,7 +11,6 @@ for i = 1:col
 
             num =  num + radianceMap(k,i) + (w(pixel) * (g(pixel) - B(j)));
             den = den + w(pixel);
-            %radianceMap(k,i) = radianceMap(k,i) + ((w(pixel) * (g(pixel) - B(j))) / w(pixel));
             
         end
         radianceMap(k,i) = num / den;
