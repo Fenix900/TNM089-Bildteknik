@@ -1,11 +1,11 @@
 function result = globalToneMapping(HDR, onRGB, scaleMethod, saturation)
 epsilon = 1e-6; %Small number
-%Result is an image in uint8 format
+
 
 if onRGB
     if strcmp(scaleMethod,"linear")
-        result = (HDR - min(HDR(:)))/ (max(HDR(:)) - min(HDR(:))); %Linear scale (0 to 1)
-        result = im2uint8(result);
+        linearScaled = (HDR - min(HDR(:)))/ (max(HDR(:)) - min(HDR(:))); %Linear scale
+        result = im2uint8(linearScaled);
     else
         %Check if image has zeros
         hasZeros = any(HDR(:) == 0); 
@@ -15,8 +15,8 @@ if onRGB
         else
             HDR_log = log2(HDR);
         end
-        result = (HDR_log - min(HDR_log(:)))/ (max(HDR_log(:)) - min(HDR_log(:))); %Maps from 0 to 1
-        result = im2uint8(result); 
+        result = (HDR_log - min(HDR_log(:)))/ (max(HDR_log(:)) - min(HDR_log(:))); 
+        result = im2uint8(result);
     end
 else %On luminance channel
     %Log2 for scale
