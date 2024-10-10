@@ -25,7 +25,7 @@ end
 
 %% Slumpa pixelpositioner
 %Skapar slumpade pixelpositioner
-pixelSamples = 200;
+pixelSamples = 1000;
 %rowPos = randi([1, row], 1, pixelSamples);
 %colPos = randi([1, col], 1, pixelSamples);
 
