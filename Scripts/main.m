@@ -2,11 +2,11 @@ clear all
 clf
 % Bilderna sökväg
 %imagePath = '../HDR/test5/';
-imagePath = '../HDR/ImagesSmall/';
-%imagePath = '../HDR/strommen/';
+%imagePath = '../HDR/ImagesSmall/';
+imagePath = '../HDR/strommen/';
 
 % Alla tiff-filer i mappen
-imageList = dir(fullfile(imagePath, '*.tiff'));
+imageList = dir(fullfile(imagePath, '*.jpg'));
 imageAmount = numel(imageList);
 
 %Första bilden
@@ -25,16 +25,17 @@ end
 
 %% Slumpa pixelpositioner
 %Skapar slumpade pixelpositioner
-pixelSamples = 200;
-%rowPos = randi([1, row], 1, pixelSamples);
-%colPos = randi([1, col], 1, pixelSamples);
+pixelSamples = 100;
+%rowPos = randi([1, row], 1, pixelSamples)';
+%colPos = randi([1, col], 1, pixelSamples)';
+%pixelPos = [rowPos, colPos];
 
 pixelPos = getPixelPos2(allImages, imageAmount, pixelSamples);
 
 %Skapar Z(i,j) för alla tre kanaler
-Z_red = zeros(pixelSamples* imageAmount,imageAmount);
-Z_green = zeros(pixelSamples *imageAmount,imageAmount);
-Z_blue = zeros(pixelSamples *imageAmount,imageAmount);
+Z_red = zeros(length(pixelPos),imageAmount);
+Z_green = zeros(length(pixelPos),imageAmount);
+Z_blue = zeros(length(pixelPos),imageAmount);
 
 for j = 1:imageAmount
     for i =1:length(pixelPos(:,1))
@@ -57,12 +58,12 @@ end
 %% B(j)
 B = zeros(imageAmount,1);
 
-lowestExposure = 1/4000;
-B(1) = lowestExposure;
-
-for j = 2:length(B)
-    B(j) = B(j-1) * 2;
-end
+% lowestExposure = 1/4000;
+% B(1) = lowestExposure;
+% 
+% for j = 2:length(B)
+%     B(j) = B(j-1) * 2;
+% end
 
 % B(2) = 1/2000; 
 % B(3) = 1/1000;
@@ -96,20 +97,20 @@ end
  % B(3) = 1.3;
 
  %Strömmen
- % B(1) = 1/8000;
- % B(2) = 1/6400;
- % B(3) = 1/3200;
- % B(4) = 1/1600;
- % B(5) = 1/800;
- % B(6) = 1/400;
- % B(7) = 1/200;
- % B(8) = 1/100;
- % B(9) = 1/50;
+ B(1) = 1/8000;
+ B(2) = 1/6400;
+ B(3) = 1/3200;
+ B(4) = 1/1600;
+ B(5) = 1/800;
+ B(6) = 1/400;
+ B(7) = 1/200;
+ B(8) = 1/100;
+ B(9) = 1/50;
 
 B = log(B);
 
 %% lambda
-lambda = 100;
+lambda = 500;
 
 %% Skapar den viktade funktionen
 w = hat(0:255);
@@ -154,17 +155,28 @@ imRed = exp(imRed);
 imGreen = exp(imGreen);
 imBlue = exp(imBlue);
 
+imRed = removeNaN(imRed);
+imGreen = removeNaN(imGreen);
+imBlue = removeNaN(imBlue);
+
 %Visa radiance map 
-showRadianceMap(imRed, imGreen, imBlue);
+%showRadianceMap(imRed, imGreen, imBlue);
 
 %Skapa HDR bilden genom att lägga ihop kanalerna
 HDR = cat(3, imRed, imGreen, imBlue);
 %% Global tone mapping
 saturationBoost = 3;
 onRGB = false;
-useReinhard = false;
+useReinhard = true;
+a = 0.27;
+s = 1.5;
+L_white = 1.5;
 
-g_result = globalToneMapping(HDR, onRGB, 'log', saturationBoost, useReinhard);
+g_result = globalToneMapping(HDR, onRGB, 'log', saturationBoost, useReinhard, a, s, L_white);
+
+figure;
+imshow(g_result);
+title('Global (log-lum)');
 
 %% 
 min(g_result(:))
@@ -173,7 +185,7 @@ max(g_result())
 
 figure;
 imshow(g_result, []);
-title('Global (log-lum)');
+title('Global');
 %% Local tone mapping
 l_result = localToneMapping(HDR, 'bilatiral', 5);
 

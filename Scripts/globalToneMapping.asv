@@ -1,4 +1,4 @@
-function result = globalToneMapping(HDR, onRGB, scaleMethod, saturation, useReinhard) 
+function result = globalToneMapping(HDR, onRGB, scaleMethod, saturation, useReinhard, a, s) 
 epsilon = 1e-6; % Small number
 
 if onRGB
@@ -22,27 +22,28 @@ else
     if useReinhard
         disp('reinhard');
 
-         R_in = HDR(:,:,1);
-         G_in = HDR(:,:,2);
-         B_in = HDR(:,:,3);
-         [R_row, R_col] = size(R_in); 
+        R_in = HDR(:,:,1);
+        G_in = HDR(:,:,2);
+        B_in = HDR(:,:,3);
+        %[R_row, R_col] = size(R_in); 
+        R_in = (R_in - min(R_in(:))) / (max(R_in(:)) - min(R_in(:))); 
+        
+        Lw = (0.27 * R_in) + (0.67 * G_in) + (0.06 * B_in); % Beräkna luminans
+        N = numel(Lw); % Total antal pixlar
+        Lw_avg = exp((1/N) * sum(log(epsilon + Lw), 'all')); % Beräkna log-genomsnittlig luminans
+        disp(Lw_avg);
 
-         Lw = (0.27 * R_in) + (0.67 * G_in) + (0.06 * B_in);
-         N = R_row * R_col;
-            Lw_avg = (1/N) * exp(sum(log(epsilon + Lw), 'all'));
-         result = Lw_avg;
-        %  disp(Lw_avg);
-        %  a = 0.1;
-        %  L = (a/Lw_avg) * Lw;
-        %  Ld = L ./ (1 + L);
-        % 
-        % s = 1;
-        % R_out = (R_in ./ (L + epsilon)).^saturation .*Ld;
-        % G_out = (G_in ./ (L + epsilon)).^saturation .*Ld;
-        % B_out = (B_in ./ (L + epsilon)).^saturation .*Ld;
-        % C_out = cat(3, R_out, G_out, B_out);
-        % 
-        % result = im2uint8(C_out);
+        L = (a / Lw_avg) * Lw; % Skalad luminans
+
+        Ld = L ./ (1 + L); % Tonmappad luminans
+
+        % Färgkanaljustering
+        R_out = (R_in ./ (L + epsilon)).^s .* Ld;
+        G_out = (G_in ./ (L + epsilon)).^s .* Ld;
+        B_out = (B_in ./ (L + epsilon)).^s .* Ld;
+
+        C_out = cat(3, R_out, G_out, B_out); % Kombinera RGB-kanaler
+        result = im2uint8(C_out); % Skala tillbaka till 8-bitars format
 
     else
         % Luminance channel scaling with log2 on L-channel

@@ -1,4 +1,4 @@
-function result = globalToneMapping(HDR, onRGB, scaleMethod, saturation, useReinhard) 
+function result = globalToneMapping(HDR, onRGB, scaleMethod, saturation, useReinhard, a, s, L_white) 
 epsilon = 1e-6; % Small number
 
 if onRGB
@@ -21,25 +21,30 @@ if onRGB
 else
     if useReinhard
         disp('reinhard');
+        HDR_log = log2(HDR + epsilon);
+        HDR_log = (HDR_log - min(HDR_log(:))) / (max(HDR_log(:)) - min(HDR_log(:)));
 
-        R_in = HDR(:,:,1);
-        G_in = HDR(:,:,2);
-        B_in = HDR(:,:,3);
-        [R_row, R_col] = size(R_in); 
+        R_in = HDR_log(:,:,1);
+        G_in = HDR_log(:,:,2);
+        B_in = HDR_log(:,:,3);
+        %[R_row, R_col] = size(R_in); 
 
-        epsilon = 1e-6; % Ett litet värde för att undvika logaritm av noll
+        
         Lw = (0.27 * R_in) + (0.67 * G_in) + (0.06 * B_in); % Beräkna luminans
         N = numel(Lw); % Total antal pixlar
         Lw_avg = exp((1/N) * sum(log(epsilon + Lw), 'all')); % Beräkna log-genomsnittlig luminans
         disp(Lw_avg);
 
-        a = 0.03; % Skalningsfaktor för luminans
         L = (a / Lw_avg) * Lw; % Skalad luminans
+        
+        %Beräkna Ld metod 1
+        %Ld = L ./ (1 + L); % Tonmappad luminans
 
-        Ld = L ./ (1 + L); % Tonmappad luminans
+        %Beräkna Ld metod 2
+
+        Ld = (L .* (1 + (L / L_white.^2))) ./ (1 + L); % Tonmappad luminans
 
         % Färgkanaljustering
-        s = 0.5; % Färgmättnad
         R_out = (R_in ./ (L + epsilon)).^s .* Ld;
         G_out = (G_in ./ (L + epsilon)).^s .* Ld;
         B_out = (B_in ./ (L + epsilon)).^s .* Ld;

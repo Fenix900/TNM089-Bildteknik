@@ -1,6 +1,6 @@
 function pixelPos = getPixelPos2(images, imageAmount, sampleAmount)
     % Definiera målvärden
-    target = linspace(765, 0, imageAmount); 
+    target = linspace(756, 0, imageAmount); 
     pixelPos = NaN(sampleAmount * imageAmount, 2);
     posInd = 1;
 
