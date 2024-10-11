@@ -1,4 +1,4 @@
-function toneMapImage = localToneMapping(HDR, lpFilter_, s)
+function toneMapImage = localToneMapping(HDR, lpFilter_, s, gaussFilterSize)
 %Scale the range of the HDR into [0, 1]
 lpFilter = lpFilter_;
 %disp( min(HDR(:)));
@@ -25,15 +25,15 @@ L = log2(L + 1e-6);
 
 %Create lowpass version of luminance channel (Y)
 L_range = max(L(:)) - min(L(:));
-degreeOfSmoothing = 100 * L_range;
+degreeOfSmoothing = 0.01 * L_range;
 
 if strcmp(lpFilter,'bilatiral')
-    L_lp = imbilatfilt(L, degreeOfSmoothing);
+    disp("bilatiral");
+    L_lp = imbilatfilt(L, 10);
 
 else %Gaussian filter
-    L_lp = imgaussfilt(L, 50);
-    min(L(:))
-    max(L(:))
+    L_lp = imgaussfilt(L, gaussFilterSize);
+    disp("gauss");
 end
 
 figure;
@@ -43,8 +43,8 @@ imshow(L_lp,[]);
 %Create highpass version of luminance channel (Y)
 L_hp = L - L_lp;
 
-figure;
-imshow(L_hp,[]);
+%figure;
+%imshow(L_hp,[]);
 
 %Scale lowpassed image
 L_lp_scaled = s * L_lp;

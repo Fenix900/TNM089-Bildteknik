@@ -25,7 +25,7 @@ end
 
 %% Slumpa pixelpositioner
 %Skapar slumpade pixelpositioner
-pixelSamples = 100;
+pixelSamples = 300;
 %rowPos = randi([1, row], 1, pixelSamples)';
 %colPos = randi([1, col], 1, pixelSamples)';
 %pixelPos = [rowPos, colPos];
@@ -168,61 +168,23 @@ HDR = cat(3, imRed, imGreen, imBlue);
 saturationBoost = 3;
 onRGB = false;
 useReinhard = true;
-a = 0.27;
+a = 0.28;
 s = 1.5;
 L_white = 1.5;
+% a = 0.15;
+% s = 1.4;
+% L_white = 1;
 
 g_result = globalToneMapping(HDR, onRGB, 'log', saturationBoost, useReinhard, a, s, L_white);
 
+
 figure;
 imshow(g_result);
-title('Global (log-lum)');
+title('');
 
-%% 
-min(g_result(:))
-max(g_result())
-%% 
-
-figure;
-imshow(g_result, []);
-title('Global');
 %% Local tone mapping
-l_result = localToneMapping(HDR, 'bilatiral', 5);
+gaussFilterSize = 4;
+l_result = localToneMapping(HDR, 'bilatiral', 2, gaussFilterSize);
 
 figure;
 imshow(l_result);
-
-%% 
-figure;
-imshow(tonemap(HDR))
-%% 
-%Tone mapping     
-s = 0.7;
-%                              isLocal     linear/log   bilatiral/gaussian    
-%imageResult = toneMapping(HDR, true,       'log',      "gauss" ,           s);
-
-globalImage = globalToneMapping(HDR, 'log');
-localImage = localToneMapping(HDR, 'bilatiral', 0.4);
-
-figure;
-subplot(1, 2, 1);
-imshow(globalImage);
-title('Global');
-
-subplot(1, 2, 2);
-imshow(localImage);
-title('Local');
-
-
-%% 
-
-figure;
-imshow(tonemap(HDR))
-
-%figure;
-%imshow(localtonemap(HDR, 'RangeCompression', 0.1))
-
-figure;
-imshow(imageResult)
-
-%HDRTone = tonemap(HDR);
