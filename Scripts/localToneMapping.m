@@ -24,9 +24,6 @@ L = log2(L + 1e-6);
 % imshow(L,[]);
 
 %Create lowpass version of luminance channel (Y)
-L_range = max(L(:)) - min(L(:));
-degreeOfSmoothing = 0.01 * L_range;
-
 if strcmp(lpFilter,'bilatiral')
     disp("bilatiral");
     L_lp = imbilatfilt(L, 10);
@@ -43,8 +40,6 @@ imshow(L_lp,[]);
 %Create highpass version of luminance channel (Y)
 L_hp = L - L_lp;
 
-%figure;
-%imshow(L_hp,[]);
 
 %Scale lowpassed image
 L_lp_scaled = s * L_lp;
